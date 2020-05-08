@@ -23,6 +23,11 @@ notificationTemplateId: ""
 Install-Module -Name Microsoft.Graph.Intune
 Connect-MSGraph
 
+<# POWERSHELL #>
+Install-Module -Name Microsoft.Graph.Intune -force
+Import-Module -Name Microsoft.Graph.Intune -verbose
+Connect-MSGraph
+
 #Windows 10 Compliance
  $Windows10Compliance = New-IntuneDeviceCompliancePolicy `
     -windows10CompliancePolicy `
