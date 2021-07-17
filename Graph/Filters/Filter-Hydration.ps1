@@ -1,5 +1,9 @@
-#Authenticate to Tenant
-#Install-Module MSAL.PS
+<#
+Enter your TenantId
+Install-Module MSAL.PS 
+Authenticate to Tenant 
+#>
+
 $authParams = @{
     ClientId    = 'd1ddf0e4-d672-4dae-b554-9d5bdfd93547'
     TenantId    = '...onmicrosoft.com'
