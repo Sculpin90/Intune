@@ -1,107 +1,172 @@
 #Authenticate to Tenant
-Connect-MSGraph -ForceInteractive
-$Resource = "deviceManagement/assignmentFilters"
-$graphApiVersion = "Beta"
-$uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
- 
+#Install-Module MSAL.PS
+$authParams = @{
+    ClientId    = 'd1ddf0e4-d672-4dae-b554-9d5bdfd93547'
+    TenantId    = 'evergr33n.onmicrosoft.com'
+    DeviceCode  = $true
+}
+$authToken = Get-MsalToken @authParams
+
 ############## Corporate ##############
 
-#Corporate Windows
-$displayName = "Windows 10 Corporate Devices"
-$description = "Corporate Windows 10 Devices"
-$platform = "windows10AndLater"
-$rule = '(device.deviceOwnership -eq "Corporate")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
-}
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+#All Windows Virtual Machines
+$filter = @{
+    displayName = 'Windows Virtual Machines'
+    description = 'Windows 10 Virtual Machines'
+    platform    = 'Windows10AndLater'
+    rule        = '(device.deviceOwnership -eq "Corporate") and (device.model -startsWith "Virtual Machine")'
+} | ConvertTo-Json -Depth 10
 
-#Corporate iOS/iPadOS 
-$displayName = "iOS/iPadOS Corporate Devices"
-$description = "Corporate iOS/iPad OS Devices"
-$platform = "iOS"
-$rule = '(device.deviceOwnership -eq "Corporate")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
 }
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+Invoke-RestMethod @graphParams
 
-#Corporate Android
-$displayName = "Android Enterprise Corporate Devices"
-$description = "Corporate Android Enterprise Devices"
-$platform = "androidForWork"
-$rule = '(device.deviceOwnership -eq "Corporate")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
-}
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+#All Corporate Windows
+$filter = @{
+    displayName = 'Windows 10 Corporate Devices'
+    description = 'Corporate Windows 10 Devices'
+    platform    = 'Windows10AndLater'
+    rule        = '(device.deviceOwnership -eq "Corporate")'
+} | ConvertTo-Json -Depth 10
 
-#Azure Virtual Desktop
-$displayName = "Azure Virtual Desktop"
-$description = "Azure Virtual Desktop"
-$platform = "windows10AndLater"
-$rule = '(device.operatingSystemSKU -eq "ServerRdsh")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
 }
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+Invoke-RestMethod @graphParams
+
+#All Corporate iOS/iPadOS 
+$filter = @{
+    displayName = 'iOS/iPadOS Corporate Devices'
+    description = 'Corporate iOS/iPad OS Devices'
+    platform    = 'iOS'
+    rule        = '(device.deviceOwnership -eq "Corporate")'
+} | ConvertTo-Json -Depth 10
+
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
+}
+Invoke-RestMethod @graphParams
+
+#All Corporate Android Enterprise
+$filter = @{
+    displayName = "Android Enterprise Corporate Devices"
+    description = "Corporate Android Enterprise Devices"
+    platform = "androidForWork"
+    rule = '(device.deviceOwnership -eq "Corporate")'
+} | ConvertTo-Json -Depth 10
+
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
+}
+Invoke-RestMethod @graphParams
+
+#All Azure Virtual Desktop
+$filter = @{
+    displayName = "Azure Virtual Desktop"
+    description = "Azure Virtual Desktop"
+    platform = "windows10AndLater"
+    rule = '(device.operatingSystemSKU -eq "ServerRdsh")'
+} | ConvertTo-Json -Depth 10  
+
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
+}
+Invoke-RestMethod @graphParams
 
 ############## Personal ##############
 
-#Personal Windows
-$displayName = "Windows 10 Personal Devices"
-$description = "Personal Windows 10 Devices"
-$platform = "windows10AndLater"
-$rule = '(device.deviceOwnership -eq "Personal")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
-}
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+#All Personal Windows 10
+$filter = @{
+    displayName = "Windows 10 Personal Devices"
+    description = "Personal Windows 10 Devices"
+    platform = "windows10AndLater"
+    rule = '(device.deviceOwnership -eq "Personal")'
+} | ConvertTo-Json -Depth 10  
 
-#Personal iOS/iPadOS 
-$displayName = "iOS/iPadOS Personal Devices"
-$description = "Personal iOS/iPad OS Devices"
-$platform = "iOS"
-$rule = '(device.deviceOwnership -eq "Personal")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
 }
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+Invoke-RestMethod @graphParams
+
+#All Personal iOS/iPadOS 
+$filter = @{
+    displayName = "iOS/iPadOS Personal Devices"
+    description = "Personal iOS/iPad OS Devices"
+    platform = "iOS"
+    rule = '(device.deviceOwnership -eq "Personal")'
+} | ConvertTo-Json -Depth 10  
+
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
+}
+Invoke-RestMethod @graphParams
 
 #Personal Android for Enterprise
-$displayName = "Android Enterprise Personal Devices"
-$description = "Personal Android Enterprise Devices"
-$platform = "androidForWork"
-$rule = '(device.deviceOwnership -eq "Personal")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
+$filter = @{
+    displayName = "Android Enterprise Personal Devices"
+    description = "Personal Android Enterprise Devices"
+    platform = "androidForWork"
+    rule = '(device.deviceOwnership -eq "Personal")'
+} | ConvertTo-Json -Depth 10  
+
+#Post
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
 }
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+Invoke-RestMethod @graphParams
