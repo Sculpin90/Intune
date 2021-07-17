@@ -1,22 +1,28 @@
 #Authenticate to Tenant
-Connect-MSGraph -ForceInteractive
-$Resource = "deviceManagement/assignmentFilters"
-$graphApiVersion = "Beta"
-$uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
- 
-############## Corporate ##############
-
-#Corporate Windows
-
-$displayName = "Windows 10 Corporate Devices"
-$description = "Corporate Windows 10 Devices"
-$platform = "windows10AndLater"
-$rule = '(device.deviceOwnership -eq "Corporate")'
-  
-$JSON = @"
-{
-"displayName":"$($displayName)","description":"$($description)","platform":"$($platform)","rule":"$($rule)","roleScopeTags":["0"]
+#Install-Module MSAL.PS
+$authParams = @{
+    ClientId    = 'd1ddf0e4-d672-4dae-b554-9d5bdfd93547'
+    TenantId    = 'evergr33n.onmicrosoft.com'
+    DeviceCode  = $true
 }
-"@
- 
-Invoke-MSGraphRequest -HttpMethod POST -Url $uri -Content $JSON
+$authToken = Get-MsalToken @authParams
+
+#All Virtual Machines
+$filter = @{
+    displayName = 'All Virtual Machines'
+    description = 'This filter will select all virtual machines'
+    platform    = 'Windows10AndLater'
+    rule        = '(device.deviceOwnership -eq "Corporate") and (device.model -startsWith "Virtual Machine")'
+} | ConvertTo-Json -Depth 10
+
+#Post Filter
+$baseGraphUri = 'https://graph.microsoft.com/beta/deviceManagement/assignmentFilters'
+$graphParams = @{
+    Method          = 'Post'
+    Uri             = $baseGraphUri
+    Authentication  = 'OAuth'
+    Token           = $authToken.AccessToken | ConvertTo-SecureString -AsPlainText -Force
+    ContentType     = 'Application/Json'
+    Body            = $filter
+}
+Invoke-RestMethod @graphParams
